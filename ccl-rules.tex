@@ -107,7 +107,7 @@ the type system, the syntax, and the definitional semantics.
   \inferrule{\type{}}{\type{Box(Triv)} \subtype \type{Box(Triv)}}\\
   \inferrule{\type{}}{\type{Box(Int)} \subtype \type{Box(Int)}}\\
   \inferrule{\type{T} \subtype \type{Box(U)} \\ \type{Box?(T)}}{\type{T} \subtype \type{Immut\ Box(U)}}\\
-  \inferrule{\type{Box(T)} \subtype \type{Immut} \\ \type{Box(U)}}{\type{immut\ Box(T)} \subtype \type{Immut\ Box(U)}}\\
+  \inferrule{\type{Box(T)} \subtype \type{Immut\ Box(U)}}{\type{immut\ Box(T)} \subtype \type{Immut\ Box(U)}}\\
   \inferrule{\type{T} \subtype \type{U} \\ \type{Box?(T)} \\ \type{Box?(U)}}{\type{Ref\ T} \subtype \type{Ref\ U}}
 \end{gather}
 
@@ -133,7 +133,7 @@ satisfy the $\type{Box?}$ condition.
   \inferrule{\syntax{x} \ltypeof \type{Ref\ T}}{\syntax{x\ @} \rtypeof \type{T}}\\
   \inferrule{\syntax{x} \rtypeof \type{Ref\ T}}{\syntax{x\ @} \rtypeof \type{T}}\\
   \inferrule{\syntax{x} \ltypeof \type{Box(T)} \\ \syntax{y} \ltypeof \type{U} \\ \type{T < : U}}{\syntax{x := y}:\type{Box(T)}}\\
-  \inferrule{\syntax{x} \ltypeof \type{Box(T)} \\ \syntax{y} \ltypeof \type{U} \\ \type{T < : U\ Box?(U)}}{\syntax{x := y}:\type{Box(T)}}
+  \inferrule{\syntax{x} \ltypeof \type{Box(T)} \\ \syntax{y} \ltypeof \type{U} \\ \type{T < : U} \\ \type{Box?(U)}}{\syntax{x := y}:\type{Box(T)}}
 \end{gather}
 
 $\syntax{x} : \type{T}$ is read as ``expression \syntax{x} is of type
