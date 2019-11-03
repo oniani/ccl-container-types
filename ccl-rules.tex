@@ -1,0 +1,215 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Filename: ccl-rules.tex
+% Author:   David Oniani
+% Modified: November 02, 2019
+%  _         _____   __  __
+% | |    __ |_   _|__\ \/ /
+% | |   / _` || |/ _ \\  /
+% | |__| (_| || |  __//  \
+% |_____\__,_||_|\___/_/\_\
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document Definition
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[margin=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{mathpartir}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Miscellaneous
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Some Setup
+\pagestyle{fancy}
+\setlength{\jot}{11pt}
+\setlength{\parindent}{0pt}
+\newcommand\rtypeof{\mathrel{:}}
+\newcommand\ltypeof{\mathrel{::}}
+\newcommand\subtype{\mathrel{<:}}
+\newcommand{\syntax}{\texttt}
+\DeclareMathAlphabet{\type}{OT1}{pzc}{m}{it}
+
+% PDF information and nice-looking urls
+\hypersetup{%
+  pdfauthor={David Oniani},
+  pdftitle={Type Inference Rules For Container Types in CCL},
+  pdfsubject={Programming Languages, Type Theory, Type Inference}
+  pdfkeywords={Programming, Languages, Types},
+  pdflang={English},
+  colorlinks=true,
+  linkcolor={black!50!blue},
+  citecolor={black!50!blue},
+  urlcolor={black!50!blue}
+}
+
+% Put a centered header of a footnote size on the top of each page
+\chead{Type Inference Rules For Container Types in CCL}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Author(s), Title, and Date
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Author(s)
+\author{David Oniani\\
+        Luther College\\
+        \href{mailto:oniada01@luther.edu}{oniada01@luther.edu}}
+
+% Title
+\title{\textbf{Type Inference Rules For Container Types in CCL}\\
+       \medskip
+       \small \textsuperscript{*}The paper is written under the direction and
+       guidance of Dr.\ Alan K. Zaring
+       (\href{mailto:akzaring@luther.edu}{akzaring@luther.edu}).}
+
+% Date
+\date{Last Updated: November 02, 2019}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Beginning of the Document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Abstract
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{abstract}
+\noindent We present the type inference rules introducing the notion of
+container types in the CCL programming language. This redesign required a
+number of substantial changes to the major aspects of the language, including
+the type system, the syntax, and the definitional semantics.
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The \subtype Relation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{The $\subtype$ Relation}
+
+\begin{gather}
+  \inferrule{\type{}}{\type{Box(Triv)} \subtype \type{Box(Triv)}}\\
+  \inferrule{\type{}}{\type{Box(Int)} \subtype \type{Box(Int)}}\\
+  \inferrule{\type{T} \subtype \type{Box(U)} \\ \type{Box?(T)}}{\type{T} \subtype \type{Immut\ Box(U)}}\\
+  \inferrule{\type{Box(T)} \subtype \type{Immut} \\ \type{Box(U)}}{\type{immut\ Box(T)} \subtype \type{Immut\ Box(U)}}\\
+  \inferrule{\type{T} \subtype \type{U} \\ \type{Box?(T)} \\ \type{Box?(U)}}{\type{Ref\ T} \subtype \type{Ref\ U}}
+\end{gather}
+
+$\type{Box?}$ statement checks for both mutable and immutable containers.
+In other words, $\type{Box(Int)}$ and $\type{immut\ Box(Int)}$ would both
+satisfy the $\type{Box?}$ condition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The : Relation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{The $\rtypeof$ and $\ltypeof$ Relations}
+
+\begin{gather}
+  \inferrule{\syntax{triv x}}{\syntax{x} \rtypeof \type{Triv}}\\
+  \inferrule{\syntax{triv x}}{\syntax{x} \ltypeof \type{Box(Triv)}}\\
+  \inferrule{\syntax{int x}}{\syntax{x} \rtypeof \type{Int}}\\
+  \inferrule{\syntax{int x}}{\syntax{x} \ltypeof \type{Box(Int)}}\\
+  \inferrule{\syntax{x} \ltypeof \type{Box(T)}}{\syntax{immut\ x} \ltypeof \type{Immut\ Box(T)}}\\
+  \inferrule{\syntax{x} \ltypeof \type{T} \\ \type{Box?(T)}}{\syntax{ref\ x} \ltypeof \type{Box(Ref\ T)}}\\
+  \inferrule{\syntax{x} \ltypeof \type{T} \\ \type{Box?(T)}}{\syntax{(\ x\ )} \ltypeof \type{T}}\\
+  \inferrule{\syntax{x} \ltypeof \type{T} \\ \type{Box?(T)}}{\syntax{\&\ x} \rtypeof \type{Ref\ T}}\\
+  \inferrule{\syntax{x} \ltypeof \type{Ref\ T}}{\syntax{x\ @} \rtypeof \type{T}}\\
+  \inferrule{\syntax{x} \rtypeof \type{Ref\ T}}{\syntax{x\ @} \rtypeof \type{T}}\\
+  \inferrule{\syntax{x} \ltypeof \type{Box(T)} \\ \syntax{y} \ltypeof \type{U} \\ \type{T < : U}}{\syntax{x := y}:\type{Box(T)}}\\
+  \inferrule{\syntax{x} \ltypeof \type{Box(T)} \\ \syntax{y} \ltypeof \type{U} \\ \type{T < : U\ Box?(U)}}{\syntax{x := y}:\type{Box(T)}}
+\end{gather}
+
+$\syntax{x} : \type{T}$ is read as ``expression \syntax{x} is of type
+$\type{T}$ and is in an \textit{r-context}.''
+
+$\syntax{x} :: \type{T}$ is read as ``variable \syntax{x} is of type $\type{T}$
+and is in an \textit{l-context}.''
+
+The operators could also be referred to as the ``r-type of'' and ``l-type of''
+operators.
+
+\medskip
+
+l-context denotes everything that is \textit{assignable} (indicated as a
+storable memory).\ r-context, on the other hand, denotes everything that is
+\textit{expressible} (can be produced by an expression).
+
+\medskip
+
+There is no r-value (e.g.\ expression) of the type $\type{Box(T)}$.
+
+\medskip
+
+We omit rules for $\type{Con}$ types as they only operate on r-values.
+
+\medskip
+
+We omit rules for $\type{Fun}$ types as they only accept r-values.
+Any variable and/or primitive type has both r-value and l-value (when it comes
+to primitive types, only r-value). In all cases, the r-value part of the actual
+parameter is passed when the function is being called.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Basic Rules
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Resulting Relationships (A Short List)}
+
+\begin{align*}
+  &\syntax{int i} &&\to i &&\to \type{Box(Int)}\\
+  &\syntax{immut int ii} &&\to ii &&\to \type{Immut\ Box(Int)}\\
+  &\syntax{ref int ri} &&\to ri &&\to \type{Box(Ref\ Box(Int))}\\
+  &\syntax{immut ref int iri} &&\to iri &&\to \type{Immut\ Box(Ref\ Box(Int))}\\
+  &\syntax{ref immut int rii} &&\to rii &&\to \type{Box(Ref\ (Immut\ Box(Int)))}\\
+  &\syntax{immut ref immut int irii} &&\to irii &&\to \type{Immut\ Box(Ref\ (Immut\ Box(Int)))}
+\end{align*}
+
+\medskip
+
+Type $\type{Immut\ Box(Immut\ Box(Int))}$ cannot exist. Nested $\type{Box}$
+types are only possible when there is at least one $\type{Ref}$ type.
+
+\begin{gather*}
+  \type{Box(Triv)} \subtype \type{Box(Triv)}\\
+  \type{Box(Int)} \subtype \type{Box(Int)}\\
+  \type{Box(Triv)} \subtype \type{Immut\ Box(Triv)}\\
+  \type{Box(Int)} \subtype \type{Immut\ Box(Int)}\\
+  \type{Immut\ Box(Triv)} \subtype \type{Immut\ Box(Triv)}\\
+  \type{Immut\ Box(Int)} \subtype \type{Immut\ Box(Int)}
+\end{gather*}
+
+\medskip
+
+All the rules above should work with $\type{Ref}$ types in the similar manner:
+
+\begin{gather*}
+  \type{Ref\ Box(Triv)} \subtype \type{Ref\ Box(Triv)}\\
+  \type{Ref\ Box(Int)} \subtype \type{Ref\ Box(Int)}\\
+  \type{Ref\ Box(Triv)} \subtype \type{Ref\ Immut\ Box(Triv)}\\
+  \type{Ref\ Box(Int)} \subtype \type{Ref\ Immut\ Box(Int)}\\
+  \type{Ref\ Immut\ Box(Triv)} \subtype \type{Ref\ Immut\ Box(Triv)}\\
+  \type{Ref\ Immut\ Box(Int)} \subtype \type{Ref\ Immut\ Box(Int)}
+\end{gather*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The End of the Document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
