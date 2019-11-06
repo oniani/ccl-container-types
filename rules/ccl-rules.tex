@@ -2,7 +2,7 @@
 %
 % Filename: ccl-rules.tex
 % Author:   David Oniani
-% Modified: November 02, 2019
+% Modified: November 05, 2019
 %  _         _____   __  __
 % | |    __ |_   _|__\ \/ /
 % | |   / _` || |/ _ \\  /
@@ -61,59 +61,10 @@
 \chead{Type Inference Rules For Container Types in CCL}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Author(s), Title, and Date
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Author(s)
-\author{David Oniani\\
-        Luther College\\
-        \href{mailto:oniada01@luther.edu}{oniada01@luther.edu}}
-
-% Title
-\title{\textbf{Type Inference Rules For Container Types in CCL}\\
-       \medskip
-       \small \textsuperscript{*}The paper is written under the direction and
-       guidance of Dr.\ Alan K. Zaring
-       (\href{mailto:akzaring@luther.edu}{akzaring@luther.edu}).}
-
-% Date
-\date{Last Updated: November 03, 2019}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Beginning of the Document
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
-\maketitle
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Abstract
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{abstract}
-\noindent We present the type inference rules introducing the notion of
-container types in the CCL programming language. This redesign required a
-number of substantial changes to the major aspects of the language, including
-the type system, the syntax, and the definitional semantics.
-\end{abstract}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The \subtype Relation
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section*{The $\subtype$ Relation}
-
-\begin{gather}
-  \inferrule{\type{}}{\type{Box(Triv)} \subtype \type{Box(Triv)}}\\
-  \inferrule{\type{}}{\type{Box(Int)} \subtype \type{Box(Int)}}\\
-  \inferrule{\type{T} \subtype \type{Box(U)} \\ \type{Box?(T)}}{\type{T} \subtype \type{Immut\ Box(U)}}\\
-  \inferrule{\type{Box(T)} \subtype \type{Immut\ Box(U)}}{\type{immut\ Box(T)} \subtype \type{Immut\ Box(U)}}\\
-  \inferrule{\type{T} \subtype \type{U} \\ \type{Box?(T)} \\ \type{Box?(U)}}{\type{Ref\ T} \subtype \type{Ref\ U}}
-\end{gather}
-
-$\type{Box?}$ statement checks for both mutable and immutable containers.
-In other words, $\type{Box(Int)}$ and $\type{immut\ Box(Int)}$ would both
-satisfy the $\type{Box?}$ condition.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % The : Relation
@@ -167,46 +118,22 @@ to primitive types, only r-value). In all cases, the r-value part of the actual
 parameter is passed when the function is being called.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Basic Rules
+% The \subtype Relation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Resulting Relationships (A Short List)}
+\section*{The $\subtype$ Relation}
 
-\begin{align*}
-  &\syntax{int i}                    &&\to i    &&\to \type{Box(Int)}\\
-  &\syntax{immut int ii}             &&\to ii   &&\to \type{Immut\ Box(Int)}\\
-  &\syntax{ref int ri}               &&\to ri   &&\to \type{Box(Ref\ Box(Int))}\\
-  &\syntax{immut ref int iri}        &&\to iri  &&\to \type{Immut\ Box(Ref\ Box(Int))}\\
-  &\syntax{ref immut int rii}        &&\to rii  &&\to \type{Box(Ref\ (Immut\ Box(Int)))}\\
-  &\syntax{immut ref immut int irii} &&\to irii &&\to \type{Immut\ Box(Ref\ (Immut\ Box(Int)))}
-\end{align*}
+\begin{gather}
+  \inferrule{\type{}}{\type{Box(Triv)} \subtype \type{Box(Triv)}}\\
+  \inferrule{\type{}}{\type{Box(Int)} \subtype \type{Box(Int)}}\\
+  \inferrule{\type{T} \subtype \type{Box(U)} \\ \type{Box?(T)}}{\type{T} \subtype \type{Immut\ Box(U)}}\\
+  \inferrule{\type{Box(T)} \subtype \type{Immut\ Box(U)}}{\type{immut\ Box(T)} \subtype \type{Immut\ Box(U)}}\\
+  \inferrule{\type{T} \subtype \type{U} \\ \type{Box?(T)} \\ \type{Box?(U)}}{\type{Ref\ T} \subtype \type{Ref\ U}}
+\end{gather}
 
-\medskip
-
-Type $\type{Immut\ Box(Immut\ Box(Int))}$ cannot exist. Nested $\type{Box}$
-types are only possible when there is at least one $\type{Ref}$ type.
-
-\begin{gather*}
-  \type{Box(Triv)}        \subtype \type{Box(Triv)}\\
-  \type{Box(Int)}         \subtype \type{Box(Int)}\\
-  \type{Box(Triv)}        \subtype \type{Immut\ Box(Triv)}\\
-  \type{Box(Int)}         \subtype \type{Immut\ Box(Int)}\\
-  \type{Immut\ Box(Triv)} \subtype \type{Immut\ Box(Triv)}\\
-  \type{Immut\ Box(Int)}  \subtype \type{Immut\ Box(Int)}
-\end{gather*}
-
-\medskip
-
-All the rules above should work with $\type{Ref}$ types in the similar manner:
-
-\begin{gather*}
-  \type{Ref\ Box(Triv)}        \subtype \type{Ref\ Box(Triv)}\\
-  \type{Ref\ Box(Int)}         \subtype \type{Ref\ Box(Int)}\\
-  \type{Ref\ Box(Triv)}        \subtype \type{Ref\ Immut\ Box(Triv)}\\
-  \type{Ref\ Box(Int)}         \subtype \type{Ref\ Immut\ Box(Int)}\\
-  \type{Ref\ Immut\ Box(Triv)} \subtype \type{Ref\ Immut\ Box(Triv)}\\
-  \type{Ref\ Immut\ Box(Int)}  \subtype \type{Ref\ Immut\ Box(Int)}
-\end{gather*}
+$\type{Box?}$ statement checks for both mutable and immutable containers.
+In other words, $\type{Box(Int)}$ and $\type{immut\ Box(Int)}$ would both
+satisfy the $\type{Box?}$ condition.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % The End of the Document
