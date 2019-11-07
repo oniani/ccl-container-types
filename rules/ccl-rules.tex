@@ -2,7 +2,7 @@
 %
 % Filename: ccl-rules.tex
 % Author:   David Oniani
-% Modified: November 05, 2019
+% Modified: November 06, 2019
 %  _         _____   __  __
 % | |    __ |_   _|__\ \/ /
 % | |   / _` || |/ _ \\  /
@@ -42,6 +42,7 @@
 \newcommand\ltypeof{\mathrel{::}}
 \newcommand\subtype{\mathrel{<:}}
 \newcommand{\syntax}{\texttt}
+\DeclareMathAlphabet{\syntaxvar}{OT1}{cmss}{m}{n}
 \DeclareMathAlphabet{\type}{OT1}{pzc}{m}{it}
 
 % PDF information and nice-looking urls
@@ -77,14 +78,12 @@
   \inferrule{\syntax{triv x}}{\syntax{x} \ltypeof \type{Box(Triv)}}\\
   \inferrule{\syntax{int x}}{\syntax{x} \rtypeof \type{Int}}\\
   \inferrule{\syntax{int x}}{\syntax{x} \ltypeof \type{Box(Int)}}\\
-  \inferrule{\syntax{x} \ltypeof \type{Box(T)}}{\syntax{immut\ x} \ltypeof \type{Immut\ Box(T)}}\\
-  \inferrule{\syntax{x} \ltypeof \type{T} \\ \type{Box?(T)}}{\syntax{ref\ x} \ltypeof \type{Box(Ref\ T)}}\\
-  \inferrule{\syntax{x} \ltypeof \type{T} \\ \type{Box?(T)}}{\syntax{(\ x\ )} \ltypeof \type{T}}\\
-  \inferrule{\syntax{x} \ltypeof \type{T} \\ \type{Box?(T)}}{\syntax{\&\ x} \rtypeof \type{Ref\ T}}\\
-  \inferrule{\syntax{x} \ltypeof \type{Ref\ T}}{\syntax{x\ @} \rtypeof \type{T}}\\
-  \inferrule{\syntax{x} \rtypeof \type{Ref\ T}}{\syntax{x\ @} \rtypeof \type{T}}\\
-  \inferrule{\syntax{x} \ltypeof \type{Box(T)} \\ \syntax{y} \ltypeof \type{U} \\ \type{T < : U}}{\syntax{x := y}:\type{Box(T)}}\\
-  \inferrule{\syntax{x} \ltypeof \type{Box(T)} \\ \syntax{y} \ltypeof \type{U} \\ \type{T < : U} \\ \type{Box?(U)}}{\syntax{x := y}:\type{Box(T)}}
+  \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{immut}\ \syntaxvar{x} \ltypeof \type{Immut(T)}}\\
+  \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{ref}\ \syntaxvar{x} \ltypeof \type{Box(Ref(T))}}\\
+  \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{\&}\ \syntaxvar{x} \rtypeof \type{Ref(T)}}\\
+  \inferrule{\syntaxvar{x} \rtypeof \type{Ref(T)}}{\syntaxvar{x}\ \syntax{@} \rtypeof \type{T}}\\
+  \inferrule{\syntaxvar{x} \rtypeof \type{Ref(T)}}{\syntaxvar{x}\ \syntax{@} \ltypeof \type{T}}\\
+  \inferrule{\syntaxvar{x} \ltypeof \type{T} \\ \syntaxvar{y} \ltypeof \type{U} \\ \type{T} \subtype \type{U} \\ \syntaxvar{x} \rtypeof \type{V}}{\syntaxvar{x}\ \syntax{:=}\ \syntaxvar{y} \rtypeof \type{V}}
 \end{gather}
 
 $\syntax{x} : \type{T}$ is read as ``expression \syntax{x} is of type
@@ -126,13 +125,13 @@ parameter is passed when the function is being called.
 \begin{gather}
   \inferrule{\type{}}{\type{Box(Triv)} \subtype \type{Box(Triv)}}\\
   \inferrule{\type{}}{\type{Box(Int)} \subtype \type{Box(Int)}}\\
-  \inferrule{\type{T} \subtype \type{Box(U)} \\ \type{Box?(T)}}{\type{T} \subtype \type{Immut\ Box(U)}}\\
-  \inferrule{\type{Box(T)} \subtype \type{Immut\ Box(U)}}{\type{immut\ Box(T)} \subtype \type{Immut\ Box(U)}}\\
-  \inferrule{\type{T} \subtype \type{U} \\ \type{Box?(T)} \\ \type{Box?(U)}}{\type{Ref\ T} \subtype \type{Ref\ U}}
+  \inferrule{\type{T} \subtype \type{Box(U)}}{\type{T} \subtype \type{Immut(Box(U))}}\\
+  \inferrule{\type{Box(T)} \subtype \type{Immut(U)}}{\type{Immut(Box(T))} \subtype \type{Immut(U)}}\\
+  \inferrule{\type{T} \subtype \type{U} \\ \type{Box?(T)}}{\type{Ref\ T} \subtype \type{Ref\ U}}
 \end{gather}
 
 $\type{Box?}$ statement checks for both mutable and immutable containers.
-In other words, $\type{Box(Int)}$ and $\type{immut\ Box(Int)}$ would both
+In other words, $\type{Box(Int)}$ and $\type{Immut(Box(Int))}$ would both
 satisfy the $\type{Box?}$ condition.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
