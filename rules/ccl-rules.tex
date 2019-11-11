@@ -15,7 +15,7 @@
 % Document Definition
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass{article}
+\documentclass[11pt]{article}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Packages
@@ -27,7 +27,7 @@
 \usepackage{amsmath}
 \usepackage{mathpartir}
 \usepackage{fancyhdr}
-\usepackage{xcolor}
+\usepackage{tikz}
 \usepackage{hyperref}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -44,6 +44,13 @@
 \newcommand{\syntax}{\texttt}
 \DeclareMathAlphabet{\syntaxvar}{OT1}{cmss}{m}{n}
 \DeclareMathAlphabet{\type}{OT1}{pzc}{m}{it}
+
+\newcommand\PlaceText[3]{%
+\begin{tikzpicture}[remember picture,overlay]
+\node[outer sep=0pt,inner sep=0pt,anchor=south west]
+  at ([xshift=#1,yshift=-#2]current page.north west) {#3};
+\end{tikzpicture}%
+}
 
 % PDF information and nice-looking urls
 \hypersetup{%
@@ -66,6 +73,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Tikz
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\PlaceText{30mm}{70mm}{\large Fonts}
+\PlaceText{30mm}{73mm}{--------------------------------}
+\PlaceText{30mm}{78mm}{\syntax{X,x} - Concrete syntax}
+\PlaceText{30mm}{83mm}{$\syntaxvar{X,x}$ - Syntax variables}
+\PlaceText{30mm}{88mm}{$\type{X,x}$ - Type variables}
+\PlaceText{30mm}{92mm}{--------------------------------}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % The : Relation
