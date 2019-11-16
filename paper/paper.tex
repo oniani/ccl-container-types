@@ -2,7 +2,7 @@
 %
 % Filename: paper.tex
 % Author:   David Oniani
-% Modified: November 10, 2019
+% Modified: November 15, 2019
 %  _         _____   __  __
 % | |    __ |_   _|__\ \/ /
 % | |   / _` || |/ _ \\  /
@@ -123,10 +123,10 @@ satisfy the $\type{Box?}$ condition.
 \section*{The $\rtypeof$ and $\ltypeof$ Relations}
 
 \begin{gather}
-  \inferrule{\syntax{triv x}}{\syntax{x} \rtypeof \type{Triv}}\\
-  \inferrule{\syntax{triv x}}{\syntax{x} \ltypeof \type{Box(Triv)}}\\
-  \inferrule{\syntax{int x}}{\syntax{x} \rtypeof \type{Int}}\\
-  \inferrule{\syntax{int x}}{\syntax{x} \ltypeof \type{Box(Int)}}\\
+  \inferrule{\syntax{triv $\syntaxvar{x}$}}{\syntaxvar{x} \rtypeof \type{Triv}}\\
+  \inferrule{\syntax{triv $\syntaxvar{x}$}}{\syntaxvar{x} \ltypeof \type{Box(Triv)}}\\
+  \inferrule{\syntax{int $\syntaxvar{x}$}}{\syntaxvar{x} \rtypeof \type{Int}}\\
+  \inferrule{\syntax{int $\syntaxvar{x}$}}{\syntaxvar{x} \ltypeof \type{Box(Int)}}\\
   \inferrule{\syntaxvar{x} \ltypeof \type{Box(T)}}{\syntax{immut}\ \syntaxvar{x} \ltypeof \type{Immut(Box(T))}}\\
   \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{ref}\ \syntaxvar{x} \ltypeof \type{Box(Ref(T))}}\\
   \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{\&}\ \syntaxvar{x} \rtypeof \type{Ref(T)}}\\
