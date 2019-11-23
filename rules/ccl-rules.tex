@@ -2,7 +2,7 @@
 %
 % Filename: ccl-rules.tex
 % Author:   David Oniani
-% Modified: November 15, 2019
+% Modified: November 23, 2019
 %  _         _____   __  __
 % | |    __ |_   _|__\ \/ /
 % | |   / _` || |/ _ \\  /
@@ -41,6 +41,7 @@
 \newcommand\rtypeof{\mathrel{:}}
 \newcommand\ltypeof{\mathrel{::}}
 \newcommand\subtype{\mathrel{<:}}
+\newcommand\subtypecont{\mathrel{<::}}
 \newcommand{\syntax}{\texttt}
 \DeclareMathAlphabet{\syntaxvar}{OT1}{cmss}{m}{n}
 \DeclareMathAlphabet{\type}{OT1}{pzc}{m}{it}
@@ -86,7 +87,7 @@
 \PlaceText{30mm}{92mm}{--------------------------------}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The : Relation
+% The : and ::: Relation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section*{The $\rtypeof$ and $\ltypeof$ Relations}
@@ -96,12 +97,13 @@
   \inferrule{\syntax{triv $\syntaxvar{x}$}}{\syntaxvar{x} \ltypeof \type{Box(Triv)}}\\
   \inferrule{\syntax{int $\syntaxvar{x}$}}{\syntaxvar{x} \rtypeof \type{Int}}\\
   \inferrule{\syntax{int $\syntaxvar{x}$}}{\syntaxvar{x} \ltypeof \type{Box(Int)}}\\
-  \inferrule{\syntaxvar{x} \ltypeof \type{Box(T)}}{\syntax{immut}\ \syntaxvar{x} \ltypeof \type{Immut(Box(T))}}\\
+  \inferrule{\syntaxvar{x} \ltypeof \type{Box(T)}}{\syntax{immut}\ \syntaxvar{x} \ltypeof \type{IBox(T)}}\\
   \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{ref}\ \syntaxvar{x} \ltypeof \type{Box(Ref(T))}}\\
   \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{\&}\ \syntaxvar{x} \rtypeof \type{Ref(T)}}\\
-  \inferrule{\syntaxvar{x} \rtypeof \type{Ref(T)}}{\syntaxvar{x}\ \syntax{@} \rtypeof \type{T}}\\
+  \inferrule{\syntaxvar{x} \rtypeof \type{Ref(Box(T))}}{\syntaxvar{x}\ \syntax{@} \rtypeof \type{T}}\\
+  \inferrule{\syntaxvar{x} \rtypeof \type{Ref(IBox(T))}}{\syntaxvar{x}\ \syntax{@} \rtypeof \type{T}}\\
   \inferrule{\syntaxvar{x} \rtypeof \type{Ref(T)}}{\syntaxvar{x}\ \syntax{@} \ltypeof \type{T}}\\
-  \inferrule{\syntaxvar{x} \ltypeof \type{T} \\ \syntaxvar{y} \ltypeof \type{U} \\ \type{T} \subtype \type{U} \\ \syntaxvar{x} \rtypeof \type{V}}{\syntaxvar{x}\ \syntax{:=}\ \syntaxvar{y} \rtypeof \type{V}}
+  \inferrule{\syntaxvar{x} \ltypeof \type{T} \\ \syntaxvar{y} \ltypeof \type{U} \\ \type{T} \subtypecont \type{U} \\ \syntaxvar{x} \rtypeof \type{V}}{\syntaxvar{x}\ \syntax{:=}\ \syntaxvar{y} \rtypeof \type{V}}
 \end{gather}
 
 $\syntax{x} : \type{T}$ is read as ``expression \syntax{x} is of type
@@ -125,27 +127,27 @@ There is no r-value (e.g.\ expression) of the type $\type{Box(T)}$.
 
 \medskip
 
-We omit rules for $\type{Con}$ types as they only operate on r-values.
+For now, we omit rules for $\type{Con}$ types as they only operate on r-values.
 
 \medskip
 
-We omit rules for $\type{Fun}$ types as they only accept r-values.
+For now, we omit rules for $\type{Fun}$ types as they only accept r-values.
 Any variable and/or primitive type has both r-value and l-value (when it comes
 to primitive types, only r-value). In all cases, the r-value part of the actual
 parameter is passed when the function is being called.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The \subtype Relation
+% The \subtypecont Relation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{The $\subtype$ Relation}
+\section*{The $\subtypecont$ Relation}
 
 \begin{gather}
-  \inferrule{\type{}}{\type{Box(Triv)} \subtype \type{Box(Triv)}}\\
-  \inferrule{\type{}}{\type{Box(Int)} \subtype \type{Box(Int)}}\\
-  \inferrule{\type{T} \subtype \type{Box(U)}}{\type{T} \subtype \type{Immut(Box(U))}}\\
-  \inferrule{\type{Box(T)} \subtype \type{Immut(U)}}{\type{Immut(Box(T))} \subtype \type{Immut(U)}}\\
-  \inferrule{\type{T} \subtype \type{U} \\ \type{Box?(T)}}{\type{Ref\ T} \subtype \type{Ref\ U}}
+  \inferrule{\type{}}{\type{Box(Triv)} \subtypecont \type{Box(Triv)}}\\
+  \inferrule{\type{}}{\type{Box(Int)} \subtypecont \type{Box(Int)}}\\
+  \inferrule{\type{T} \subtypecont \type{Box(U)}}{\type{T} \subtypecont \type{IBox(U)}}\\
+  \inferrule{\type{Box(T)} \subtypecont \type{IBox(U)}}{\type{IBox(T)} \subtypecont \type{IBox(U)}}\\
+  \inferrule{\type{T} \subtypecont \type{U}}{\type{Ref\ T} \subtypecont \type{Ref\ U}}
 \end{gather}
 
 $\type{Box?}$ statement checks for both mutable and immutable containers.

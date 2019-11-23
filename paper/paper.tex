@@ -2,7 +2,7 @@
 %
 % Filename: paper.tex
 % Author:   David Oniani
-% Modified: November 15, 2019
+% Modified: November 23, 2019
 %  _         _____   __  __
 % | |    __ |_   _|__\ \/ /
 % | |   / _` || |/ _ \\  /
@@ -41,6 +41,7 @@
 \newcommand\rtypeof{\mathrel{:}}
 \newcommand\ltypeof{\mathrel{::}}
 \newcommand\subtype{\mathrel{<:}}
+\newcommand\subtypecont{\mathrel{<::}}
 \newcommand{\syntax}{\texttt}
 \DeclareMathAlphabet{\syntaxvar}{OT1}{cmss}{m}{n}
 \DeclareMathAlphabet{\type}{OT1}{pzc}{m}{it}
@@ -73,8 +74,8 @@
 % Title
 \title{\textbf{Type Inference Rules For Container Types in CCL}\\
        \medskip
-       \small \textsuperscript{*}The paper is written under the direction and
-       guidance of Dr.\ Alan K. Zaring
+       \small \textsuperscript{*}The paper is written under the guidance of
+       Dr.\ Alan K. Zaring
        (\href{mailto:akzaring@luther.edu}{akzaring@luther.edu}).}
 
 % Date
@@ -99,25 +100,30 @@ the type system, the syntax, and the definitional semantics.
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The \subtype Relation
+% The <:: Relation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{The $\subtype$ Relation}
+\section*{The $\subtypecont$ Relation}
 
 \begin{gather}
-  \inferrule{\type{}}{\type{Box(Triv)} \subtype \type{Box(Triv)}}\\
-  \inferrule{\type{}}{\type{Box(Int)} \subtype \type{Box(Int)}}\\
-  \inferrule{\type{T} \subtype \type{Box(U)}}{\type{T} \subtype \type{Immut(Box(U))}}\\
-  \inferrule{\type{Box(T)} \subtype \type{Immut(U)}}{\type{Immut(Box(T))} \subtype \type{Immut(U)}}\\
-  \inferrule{\type{T} \subtype \type{U} \\ \type{Box?(T)}}{\type{Ref\ T} \subtype \type{Ref\ U}}
+  \inferrule{\type{}}{\type{Box(Triv)} \subtypecont \type{Box(Triv)}}\\
+  \inferrule{\type{}}{\type{Box(Int)} \subtypecont \type{Box(Int)}}\\
+  \inferrule{\type{T} \subtypecont \type{Box(U)}}{\type{T} \subtypecont \type{IBox(U)}}\\
+  \inferrule{\type{Box(T)} \subtypecont \type{IBox(U)}}{\type{IBox(T)} \subtypecont \type{IBox(U)}}\\
+  \inferrule{\type{T} \subtypecont \type{U}}{\type{Ref\ T} \subtypecont \type{Ref\ U}}
 \end{gather}
 
-$\type{Box?}$ statement checks for both mutable and immutable containers.
-In other words, $\type{Box(Int)}$ and $\type{Immut(Box(Int))}$ would both
-satisfy the $\type{Box?}$ condition.
+
+$\subtypecont$ operator specifies the subtype relationship between two
+container types.
+
+\medskip
+
+$\type{T} \subtypecont \type{U}$ is read as ``container type $\type{T}$ is a
+subtype of the container type $\type{U}$.''
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The : Relation
+% The : and :: Relations
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section*{The $\rtypeof$ and $\ltypeof$ Relations}
@@ -127,12 +133,13 @@ satisfy the $\type{Box?}$ condition.
   \inferrule{\syntax{triv $\syntaxvar{x}$}}{\syntaxvar{x} \ltypeof \type{Box(Triv)}}\\
   \inferrule{\syntax{int $\syntaxvar{x}$}}{\syntaxvar{x} \rtypeof \type{Int}}\\
   \inferrule{\syntax{int $\syntaxvar{x}$}}{\syntaxvar{x} \ltypeof \type{Box(Int)}}\\
-  \inferrule{\syntaxvar{x} \ltypeof \type{Box(T)}}{\syntax{immut}\ \syntaxvar{x} \ltypeof \type{Immut(Box(T))}}\\
+  \inferrule{\syntaxvar{x} \ltypeof \type{Box(T)}}{\syntax{immut}\ \syntaxvar{x} \ltypeof \type{IBox(T)}}\\
   \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{ref}\ \syntaxvar{x} \ltypeof \type{Box(Ref(T))}}\\
   \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{\&}\ \syntaxvar{x} \rtypeof \type{Ref(T)}}\\
-  \inferrule{\syntaxvar{x} \rtypeof \type{Ref(T)}}{\syntaxvar{x}\ \syntax{@} \rtypeof \type{T}}\\
+  \inferrule{\syntaxvar{x} \rtypeof \type{Ref(Box(T))}}{\syntaxvar{x}\ \syntax{@} \rtypeof \type{T}}\\
+  \inferrule{\syntaxvar{x} \rtypeof \type{Ref(IBox(T))}}{\syntaxvar{x}\ \syntax{@} \rtypeof \type{T}}\\
   \inferrule{\syntaxvar{x} \rtypeof \type{Ref(T)}}{\syntaxvar{x}\ \syntax{@} \ltypeof \type{T}}\\
-  \inferrule{\syntaxvar{x} \ltypeof \type{T} \\ \syntaxvar{y} \ltypeof \type{U} \\ \type{T} \subtype \type{U} \\ \syntaxvar{x} \rtypeof \type{V}}{\syntaxvar{x}\ \syntax{:=}\ \syntaxvar{y} \rtypeof \type{V}}
+  \inferrule{\syntaxvar{x} \ltypeof \type{T} \\ \syntaxvar{y} \ltypeof \type{U} \\ \type{T} \subtypecont \type{U} \\ \syntaxvar{x} \rtypeof \type{V}}{\syntaxvar{x}\ \syntax{:=}\ \syntaxvar{y} \rtypeof \type{V}}
 \end{gather}
 
 $\syntax{x} : \type{T}$ is read as ``expression \syntax{x} is of type
@@ -156,11 +163,11 @@ There is no r-value (e.g.\ expression) of the type $\type{Box(T)}$.
 
 \medskip
 
-We omit rules for $\type{Con}$ types as they only operate on r-values.
+For now, we omit rules for $\type{Con}$ types as they only operate on r-values.
 
 \medskip
 
-We omit rules for $\type{Fun}$ types as they only accept r-values.
+For now, we omit rules for $\type{Fun}$ types as they only accept r-values.
 Any variable and/or primitive type has both r-value and l-value (when it comes
 to primitive types, only r-value). In all cases, the r-value part of the actual
 parameter is passed when the function is being called.
@@ -173,11 +180,11 @@ parameter is passed when the function is being called.
 
 \begin{align*}
   &\syntax{int i}                    &&\to i    &&\to \type{Box(Int)}\\
-  &\syntax{immut int ii}             &&\to ii   &&\to \type{Immut(Box(Int))}\\
+  &\syntax{immut int ii}             &&\to ii   &&\to \type{IBox(Int)}\\
   &\syntax{ref int ri}               &&\to ri   &&\to \type{Box(Ref(Box(Int)))}\\
-  &\syntax{immut ref int iri}        &&\to iri  &&\to \type{Immut(Box(Ref(Box(Int))))}\\
+  &\syntax{immut ref int iri}        &&\to iri  &&\to \type{IBox(Ref(Box(Int)))}\\
   &\syntax{ref immut int rii}        &&\to rii  &&\to \type{Box(Ref((Immut(Box(Int)))))}\\
-  &\syntax{immut ref immut int irii} &&\to irii &&\to \type{Immut(Box(Ref((Immut(Box(Int))))))}
+  &\syntax{immut ref immut int irii} &&\to irii &&\to \type{IBox(Ref((Immut(Box(Int)))))}
 \end{align*}
 
 \medskip
@@ -186,12 +193,12 @@ Type $\type{Immut\ Box(Immut\ Box(Int))}$ cannot exist. Nested $\type{Box}$
 types are only possible when there is at least one $\type{Ref}$ type.
 
 \begin{gather*}
-  \type{Box(Triv)}        \subtype \type{Box(Triv)}\\
-  \type{Box(Int)}         \subtype \type{Box(Int)}\\
-  \type{Box(Triv)}        \subtype \type{Immut(Box(Triv))}\\
-  \type{Box(Int)}         \subtype \type{Immut(Box(Int))}\\
-  \type{Immut(Box(Triv))} \subtype \type{Immut(Box(Triv))}\\
-  \type{Immut(Box(Int))}  \subtype \type{Immut(Box(Int))}
+  \type{Box(Triv)}  \subtype \type{Box(Triv)}\\
+  \type{Box(Int)}   \subtype \type{Box(Int)}\\
+  \type{Box(Triv)}  \subtype \type{IBox(Triv)}\\
+  \type{Box(Int)}   \subtype \type{IBox(Int)}\\
+  \type{IBox(Triv)} \subtype \type{IBox(Triv)}\\
+  \type{IBox(Int)}  \subtype \type{IBox(Int)}
 \end{gather*}
 
 \medskip
@@ -199,12 +206,12 @@ types are only possible when there is at least one $\type{Ref}$ type.
 All the rules above should work with $\type{Ref}$ types in the similar manner:
 
 \begin{gather*}
-  \type{Ref(Box(Triv))}        \subtype \type{Ref(Box(Triv))}\\
-  \type{Ref(Box(Int))}         \subtype \type{Ref(Box(Int))}\\
-  \type{Ref(Box(Triv))}        \subtype \type{Ref(Immut(Box(Triv)))}\\
-  \type{Ref(Box(Int))}         \subtype \type{Ref(Immut(Box(Int)))}\\
-  \type{Ref(Immut(Box(Triv)))} \subtype \type{Ref(Immut(Box(Triv)))}\\
-  \type{Ref(Immut(Box(Int)))}  \subtype \type{Ref(Immut(Box(Int)))}
+  \type{Ref(Box(Triv))}  \subtype \type{Ref(Box(Triv))}\\
+  \type{Ref(Box(Int))}   \subtype \type{Ref(Box(Int))}\\
+  \type{Ref(Box(Triv))}  \subtype \type{Ref(IBox(Triv))}\\
+  \type{Ref(Box(Int))}   \subtype \type{Ref(IBox(Int))}\\
+  \type{Ref(IBox(Triv))} \subtype \type{Ref(IBox(Triv))}\\
+  \type{Ref(IBox(Int))}  \subtype \type{Ref(IBox(Int))}
 \end{gather*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
