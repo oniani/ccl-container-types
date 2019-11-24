@@ -147,7 +147,7 @@ parameter is passed when the function is being called.
   \inferrule{\type{}}{\type{Box(Int)} \subtypecont \type{Box(Int)}}\\
   \inferrule{\type{T} \subtypecont \type{Box(U)}}{\type{T} \subtypecont \type{IBox(U)}}\\
   \inferrule{\type{Box(T)} \subtypecont \type{IBox(U)}}{\type{IBox(T)} \subtypecont \type{IBox(U)}}\\
-  \inferrule{\type{T} \subtypecont \type{U}}{\type{Ref\ T} \subtypecont \type{Ref\ U}}
+  \inferrule{\type{T} \subtypecont \type{U}}{\type{Ref\ T} \subtype \type{Ref\ U}}
 \end{gather}
 
 $\type{Box?}$ statement checks for both mutable and immutable containers.

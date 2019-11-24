@@ -2,7 +2,7 @@
 %
 % Filename: paper.tex
 % Author:   David Oniani
-% Modified: November 23, 2019
+% Modified: November 24, 2019
 %  _         _____   __  __
 % | |    __ |_   _|__\ \/ /
 % | |   / _` || |/ _ \\  /
@@ -110,7 +110,7 @@ the type system, the syntax, and the definitional semantics.
   \inferrule{\type{}}{\type{Box(Int)} \subtypecont \type{Box(Int)}}\\
   \inferrule{\type{T} \subtypecont \type{Box(U)}}{\type{T} \subtypecont \type{IBox(U)}}\\
   \inferrule{\type{Box(T)} \subtypecont \type{IBox(U)}}{\type{IBox(T)} \subtypecont \type{IBox(U)}}\\
-  \inferrule{\type{T} \subtypecont \type{U}}{\type{Ref\ T} \subtypecont \type{Ref\ U}}
+  \inferrule{\type{T} \subtypecont \type{U}}{\type{Ref\ T} \subtype \type{Ref\ U}}
 \end{gather}
 
 
