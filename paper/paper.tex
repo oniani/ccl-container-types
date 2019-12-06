@@ -2,7 +2,7 @@
 %
 % Filename: paper.tex
 % Author:   David Oniani
-% Modified: November 24, 2019
+% Modified: December 07, 2019
 %  _         _____   __  __
 % | |    __ |_   _|__\ \/ /
 % | |   / _` || |/ _ \\  /
@@ -79,7 +79,7 @@
        (\href{mailto:akzaring@luther.edu}{akzaring@luther.edu}).}
 
 % Date
-\date{Last Updated: \today}
+\date{\today}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Beginning of the Document
@@ -95,45 +95,76 @@
 \begin{abstract}
 \noindent We present the type inference rules introducing the notion of
 container types in the CCL programming language. This redesign required a
-number of substantial changes to the major aspects of the language, including
-the type system, the syntax, and the definitional semantics.
+number of substantial changes to the major aspects of the type system and the
+syntax of the language. Two new types $\type{Box}$ and $\type{IBox}$ were
+introduced. In addition, two new operators $\subtypecont$ and $\ltypeof$ were
+designed for dealing with the new types.
 \end{abstract}
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The <:: Relation
+% The Box and IBox Types
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{The $\type{Box}$ and $\type{IBox}$ Types}
+
+CCL is, by and large, value-based language. This makes it rather difficult to
+have types more complex than what already comprises CCL. Besides, this is a
+major obstacle for the implementation of heterogenous types such as
+heterogenous ordered pair, heterogenous vector types, etc. One possible
+solution to this problem is introducing the notion of container types.
+
+\medskip
+
+Container types are boxes which are either mutable or immutable. They wrap the
+values allowing the composition of compound types by bringing the higher levels
+of abstraction. Mutable and immutable types are represented by types
+$\type{Box}$ and the $\type{IBox}$ respectively. If these boxes hold some type
+$\type{T}$, then the result of wrapping the type will be $\type{Box(T)}$ or
+$\type{IBox(T)}$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The <: and <:: Relations
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section*{The $\subtypecont$ Relation}
 
+For expressing relationships between container types, we introduce a new
+$\subtypecont$ operator. The sole purpose of this operator is to specify the
+relation between two container types. As an example, $\type{T} \subtypecont
+\type{U}$ is read as ``container type $\type{T}$ is a subtype of the container
+type $\type{U}$.'' We proceed by introducing rules based on the new operator.
+
 \begin{gather}
   \inferrule{\type{}}{\type{Box(Triv)} \subtypecont \type{Box(Triv)}}\\
-  \inferrule{\type{}}{\type{Box(Int)} \subtypecont \type{Box(Int)}}\\
+  \inferrule{\type{}}{\type{Box(Int)} \subtypecont \type{Box(Int)}}
+\end{gather}
+
+Rules 1 and 2 specify the reflexive property of the operator on $\type{Triv}$
+and $\type{Int}$.
+
+\begin{gather}
   \inferrule{\type{T} \subtypecont \type{Box(U)}}{\type{T} \subtypecont \type{IBox(U)}}\\
   \inferrule{\type{Box(T)} \subtypecont \type{IBox(U)}}{\type{IBox(T)} \subtypecont \type{IBox(U)}}\\
   \inferrule{\type{T} \subtypecont \type{U}}{\type{Ref\ T} \subtype \type{Ref\ U}}
 \end{gather}
 
-
-$\subtypecont$ operator specifies the subtype relationship between two
-container types.
-
 \medskip
 
-$\type{T} \subtypecont \type{U}$ is read as ``container type $\type{T}$ is a
-subtype of the container type $\type{U}$.''
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % The : and :: Relations
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{The $\rtypeof$ and $\ltypeof$ Relations}
+\section*{The $\ltypeof$ Relation}
 
 \begin{gather}
   \inferrule{\syntax{triv $\syntaxvar{x}$}}{\syntaxvar{x} \rtypeof \type{Triv}}\\
   \inferrule{\syntax{triv $\syntaxvar{x}$}}{\syntaxvar{x} \ltypeof \type{Box(Triv)}}\\
   \inferrule{\syntax{int $\syntaxvar{x}$}}{\syntaxvar{x} \rtypeof \type{Int}}\\
   \inferrule{\syntax{int $\syntaxvar{x}$}}{\syntaxvar{x} \ltypeof \type{Box(Int)}}\\
-  \inferrule{\syntaxvar{x} \ltypeof \type{Box(T)}}{\syntax{immut}\ \syntaxvar{x} \ltypeof \type{IBox(T)}}\\
+  \inferrule{\syntaxvar{x} \ltypeof \type{Box(T)}}{\syntax{immut}\ \syntaxvar{x} \rtypeof \type{T}}\\
+  \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{ref}\ \syntaxvar{x} \rtypeof \type{Ref(T)}}\\
   \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{ref}\ \syntaxvar{x} \ltypeof \type{Box(Ref(T))}}\\
   \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{\&}\ \syntaxvar{x} \rtypeof \type{Ref(T)}}\\
   \inferrule{\syntaxvar{x} \rtypeof \type{Ref(Box(T))}}{\syntaxvar{x}\ \syntax{@} \rtypeof \type{T}}\\

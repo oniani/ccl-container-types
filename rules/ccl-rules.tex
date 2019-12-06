@@ -2,7 +2,7 @@
 %
 % Filename: ccl-rules.tex
 % Author:   David Oniani
-% Modified: November 23, 2019
+% Modified: December 07, 2019
 %  _         _____   __  __
 % | |    __ |_   _|__\ \/ /
 % | |   / _` || |/ _ \\  /
@@ -97,7 +97,8 @@
   \inferrule{\syntax{triv $\syntaxvar{x}$}}{\syntaxvar{x} \ltypeof \type{Box(Triv)}}\\
   \inferrule{\syntax{int $\syntaxvar{x}$}}{\syntaxvar{x} \rtypeof \type{Int}}\\
   \inferrule{\syntax{int $\syntaxvar{x}$}}{\syntaxvar{x} \ltypeof \type{Box(Int)}}\\
-  \inferrule{\syntaxvar{x} \ltypeof \type{Box(T)}}{\syntax{immut}\ \syntaxvar{x} \ltypeof \type{IBox(T)}}\\
+  \inferrule{\syntaxvar{x} \ltypeof \type{Box(T)}}{\syntax{immut}\ \syntaxvar{x} \rtypeof \type{T}}\\
+  \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{ref}\ \syntaxvar{x} \rtypeof \type{Ref(T)}}\\
   \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{ref}\ \syntaxvar{x} \ltypeof \type{Box(Ref(T))}}\\
   \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{\&}\ \syntaxvar{x} \rtypeof \type{Ref(T)}}\\
   \inferrule{\syntaxvar{x} \rtypeof \type{Ref(Box(T))}}{\syntaxvar{x}\ \syntax{@} \rtypeof \type{T}}\\
@@ -140,7 +141,7 @@ parameter is passed when the function is being called.
 % The \subtypecont Relation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{The $\subtypecont$ Relation}
+\section*{The $\subtype$ and $\subtypecont$ Relation}
 
 \begin{gather}
   \inferrule{\type{}}{\type{Box(Triv)} \subtypecont \type{Box(Triv)}}\\
