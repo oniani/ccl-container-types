@@ -2,7 +2,7 @@
 %
 % Filename: paper.tex
 % Author:   David Oniani
-% Modified: December 07, 2019
+% Modified: December 12, 2019
 %  _         _____   __  __
 % | |    __ |_   _|__\ \/ /
 % | |   / _` || |/ _ \\  /
@@ -101,7 +101,6 @@ introduced. In addition, two new operators $\subtypecont$ and $\ltypeof$ were
 designed for dealing with the new types.
 \end{abstract}
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % The Box and IBox Types
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -119,29 +118,29 @@ solution to this problem is introducing the notion of container types.
 Container types are boxes which are either mutable or immutable. They wrap the
 values allowing the composition of compound types by bringing the higher levels
 of abstraction. Mutable and immutable types are represented by types
-$\type{Box}$ and the $\type{IBox}$ respectively. If these boxes hold some type
-$\type{T}$, then the result of wrapping the type will be $\type{Box(T)}$ or
-$\type{IBox(T)}$.
+$\type{Box}$ and $\type{IBox}$ respectively. For some type $\type{T}$, the
+result of the wrapping is either $\type{Box(T)}$ or $\type{IBox(T)}$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The <: and <:: Relations
+% The <:: Relation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section*{The $\subtypecont$ Relation}
 
 For expressing relationships between container types, we introduce a new
 $\subtypecont$ operator. The sole purpose of this operator is to specify the
-relation between two container types. As an example, $\type{T} \subtypecont
-\type{U}$ is read as ``container type $\type{T}$ is a subtype of the container
-type $\type{U}$.'' We proceed by introducing rules based on the new operator.
+subtype relation between two container types. As an example, $\type{T}
+\subtypecont \type{U}$ is read as ``container type $\type{T}$ is a subtype of
+the container type $\type{U}$.'' We proceed by introducing rules based on the
+new operator.
 
 \begin{gather}
   \inferrule{\type{}}{\type{Box(Triv)} \subtypecont \type{Box(Triv)}}\\
   \inferrule{\type{}}{\type{Box(Int)} \subtypecont \type{Box(Int)}}
 \end{gather}
 
-Rules 1 and 2 specify the reflexive property of the operator on $\type{Triv}$
-and $\type{Int}$.
+Rules 1 and 2 specify the reflexive property of the operator on types
+$\type{Triv}$ and $\type{Int}$.
 
 \begin{gather}
   \inferrule{\type{T} \subtypecont \type{Box(U)}}{\type{T} \subtypecont \type{IBox(U)}}\\
@@ -149,50 +148,75 @@ and $\type{Int}$.
   \inferrule{\type{T} \subtypecont \type{U}}{\type{Ref\ T} \subtype \type{Ref\ U}}
 \end{gather}
 
-\medskip
-
+Rules 4 and 5 show the subtype relationship between container types and rule
+6 describes the relationship between $\type{Ref}$ types.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The : and :: Relations
+% The :: Relation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{The $\ltypeof$ Relation}
+\section*{The $\ltypeof$ Relation -- L-types and R-types}
+
+In order to have a clear separation between containers and values, we introduce
+a new operator $\ltypeof$ for specifying an l-type of variable/syntax variable.
+$\syntax{x} :: \type{T}$ is read as ``variable \syntax{x} is of type $\type{T}$
+and is in an \textit{l-context}.'' We call the already existing $\rtypeof$
+operator the r-type operator. $\syntax{x} : \type{T}$ is read as ``expression
+\syntax{x} is of type $\type{T}$ and is in an \textit{r-context}.'' The
+operators could also be referred to as the ``r-type of'' and ``l-type of''
+operators. It should be noted that l-context denotes everything that is
+\textit{assignable} (indicated as a storable memory) and the r-context, on the
+other hand, denotes everything that is \textit{expressible} (can be produced by
+an expression). There is no r-value of the type $\type{Box(T)}$.
 
 \begin{gather}
   \inferrule{\syntax{triv $\syntaxvar{x}$}}{\syntaxvar{x} \rtypeof \type{Triv}}\\
   \inferrule{\syntax{triv $\syntaxvar{x}$}}{\syntaxvar{x} \ltypeof \type{Box(Triv)}}\\
   \inferrule{\syntax{int $\syntaxvar{x}$}}{\syntaxvar{x} \rtypeof \type{Int}}\\
-  \inferrule{\syntax{int $\syntaxvar{x}$}}{\syntaxvar{x} \ltypeof \type{Box(Int)}}\\
-  \inferrule{\syntaxvar{x} \ltypeof \type{Box(T)}}{\syntax{immut}\ \syntaxvar{x} \rtypeof \type{T}}\\
+  \inferrule{\syntax{int $\syntaxvar{x}$}}{\syntaxvar{x} \ltypeof \type{Box(Int)}}
+\end{gather}
+
+Rules 6 and 7 show the l-value and r-value of the type $\type{triv}$ while
+rules 8 and 9 specify similar relationships for the $\type{int}$ type.
+
+\begin{gather}
+  \inferrule{\syntaxvar{x} \ltypeof \type{Box(T)}}{\syntax{immut}\ \syntaxvar{x} \rtypeof \type{T}}
+\end{gather}
+
+Rule 10 shows the r-value of the immutable syntax variable.
+
+\begin{gather}
   \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{ref}\ \syntaxvar{x} \rtypeof \type{Ref(T)}}\\
-  \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{ref}\ \syntaxvar{x} \ltypeof \type{Box(Ref(T))}}\\
-  \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{\&}\ \syntaxvar{x} \rtypeof \type{Ref(T)}}\\
+  \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{ref}\ \syntaxvar{x} \ltypeof \type{Box(Ref(T))}}
+\end{gather}
+
+Rules 11 and 12 describe the behavior of the \syntax{ref} operator when applied
+on container types.
+
+\begin{gather}
+  \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{\&}\ \syntaxvar{x} \rtypeof \type{Ref(T)}}
+\end{gather}
+
+Rule 13 specifies the behavior of \syntax{\&} operator, when applied on the
+container type.
+
+\begin{gather}
   \inferrule{\syntaxvar{x} \rtypeof \type{Ref(Box(T))}}{\syntaxvar{x}\ \syntax{@} \rtypeof \type{T}}\\
   \inferrule{\syntaxvar{x} \rtypeof \type{Ref(IBox(T))}}{\syntaxvar{x}\ \syntax{@} \rtypeof \type{T}}\\
-  \inferrule{\syntaxvar{x} \rtypeof \type{Ref(T)}}{\syntaxvar{x}\ \syntax{@} \ltypeof \type{T}}\\
+  \inferrule{\syntaxvar{x} \rtypeof \type{Ref(T)}}{\syntaxvar{x}\ \syntax{@} \ltypeof \type{T}}
+\end{gather}
+
+Rules 14, 15, and 16 show the behavior of the \syntax{@} operator under
+different conditions.
+
+\begin{gather}
   \inferrule{\syntaxvar{x} \ltypeof \type{T} \\ \syntaxvar{y} \ltypeof \type{U} \\ \type{T} \subtypecont \type{U} \\ \syntaxvar{x} \rtypeof \type{V}}{\syntaxvar{x}\ \syntax{:=}\ \syntaxvar{y} \rtypeof \type{V}}
 \end{gather}
 
-$\syntax{x} : \type{T}$ is read as ``expression \syntax{x} is of type
-$\type{T}$ and is in an \textit{r-context}.''
+Rule 17 shows the behavior of the assignment operator.
+\newline
 
-$\syntax{x} :: \type{T}$ is read as ``variable \syntax{x} is of type $\type{T}$
-and is in an \textit{l-context}.''
-
-The operators could also be referred to as the ``r-type of'' and ``l-type of''
-operators.
-
-\medskip
-
-l-context denotes everything that is \textit{assignable} (indicated as a
-storable memory).\ r-context, on the other hand, denotes everything that is
-\textit{expressible} (can be produced by an expression).
-
-\medskip
-
-There is no r-value (e.g.\ expression) of the type $\type{Box(T)}$.
-
-\medskip
+{\Large Notes}
 
 For now, we omit rules for $\type{Con}$ types as they only operate on r-values.
 
@@ -207,15 +231,15 @@ parameter is passed when the function is being called.
 % Basic Rules
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Resulting Relationships (A Short List)}
+\section*{Example Relationships}
 
 \begin{align*}
   &\syntax{int i}                    &&\to i    &&\to \type{Box(Int)}\\
   &\syntax{immut int ii}             &&\to ii   &&\to \type{IBox(Int)}\\
   &\syntax{ref int ri}               &&\to ri   &&\to \type{Box(Ref(Box(Int)))}\\
   &\syntax{immut ref int iri}        &&\to iri  &&\to \type{IBox(Ref(Box(Int)))}\\
-  &\syntax{ref immut int rii}        &&\to rii  &&\to \type{Box(Ref((Immut(Box(Int)))))}\\
-  &\syntax{immut ref immut int irii} &&\to irii &&\to \type{IBox(Ref((Immut(Box(Int)))))}
+  &\syntax{ref immut int rii}        &&\to rii  &&\to \type{Box(Ref((IBox(Int))))}\\
+  &\syntax{immut ref immut int irii} &&\to irii &&\to \type{IBox(Ref((IBox(Int))))}
 \end{align*}
 
 \medskip
@@ -224,25 +248,12 @@ Type $\type{Immut\ Box(Immut\ Box(Int))}$ cannot exist. Nested $\type{Box}$
 types are only possible when there is at least one $\type{Ref}$ type.
 
 \begin{gather*}
-  \type{Box(Triv)}  \subtype \type{Box(Triv)}\\
-  \type{Box(Int)}   \subtype \type{Box(Int)}\\
-  \type{Box(Triv)}  \subtype \type{IBox(Triv)}\\
-  \type{Box(Int)}   \subtype \type{IBox(Int)}\\
-  \type{IBox(Triv)} \subtype \type{IBox(Triv)}\\
-  \type{IBox(Int)}  \subtype \type{IBox(Int)}
-\end{gather*}
-
-\medskip
-
-All the rules above should work with $\type{Ref}$ types in the similar manner:
-
-\begin{gather*}
-  \type{Ref(Box(Triv))}  \subtype \type{Ref(Box(Triv))}\\
-  \type{Ref(Box(Int))}   \subtype \type{Ref(Box(Int))}\\
-  \type{Ref(Box(Triv))}  \subtype \type{Ref(IBox(Triv))}\\
-  \type{Ref(Box(Int))}   \subtype \type{Ref(IBox(Int))}\\
-  \type{Ref(IBox(Triv))} \subtype \type{Ref(IBox(Triv))}\\
-  \type{Ref(IBox(Int))}  \subtype \type{Ref(IBox(Int))}
+  \type{Box(Triv)}  \subtypecont \type{Box(Triv)}\\
+  \type{Box(Int)}   \subtypecont \type{Box(Int)}\\
+  \type{Box(Triv)}  \subtypecont \type{IBox(Triv)}\\
+  \type{Box(Int)}   \subtypecont \type{IBox(Int)}\\
+  \type{IBox(Triv)} \subtypecont \type{IBox(Triv)}\\
+  \type{IBox(Int)}  \subtypecont \type{IBox(Int)}
 \end{gather*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
