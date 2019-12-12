@@ -2,7 +2,7 @@
 %
 % Filename: ccl-rules.tex
 % Author:   David Oniani
-% Modified: December 07, 2019
+% Modified: December 12, 2019
 %  _         _____   __  __
 % | |    __ |_   _|__\ \/ /
 % | |   / _` || |/ _ \\  /
@@ -120,7 +120,6 @@ operators.
 
 l-context denotes everything that is \textit{assignable} (indicated as a
 storable memory).\ r-context, on the other hand, denotes everything that is
-\textit{expressible} (can be produced by an expression).
 
 \medskip
 
@@ -141,7 +140,7 @@ parameter is passed when the function is being called.
 % The \subtypecont Relation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{The $\subtype$ and $\subtypecont$ Relation}
+\section*{The $\subtype$ and $\subtypecont$ Relations}
 
 \begin{gather}
   \inferrule{\type{}}{\type{Box(Triv)} \subtypecont \type{Box(Triv)}}\\
@@ -150,10 +149,6 @@ parameter is passed when the function is being called.
   \inferrule{\type{Box(T)} \subtypecont \type{IBox(U)}}{\type{IBox(T)} \subtypecont \type{IBox(U)}}\\
   \inferrule{\type{T} \subtypecont \type{U}}{\type{Ref\ T} \subtype \type{Ref\ U}}
 \end{gather}
-
-$\type{Box?}$ statement checks for both mutable and immutable containers.
-In other words, $\type{Box(Int)}$ and $\type{Immut(Box(Int))}$ would both
-satisfy the $\type{Box?}$ condition.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % The End of the Document
