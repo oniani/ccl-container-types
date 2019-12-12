@@ -109,8 +109,8 @@ designed for dealing with the new types.
 
 CCL is, by and large, value-based language. This makes it rather difficult to
 have types more complex than what already comprises CCL. Besides, this is a
-major obstacle for the implementation of heterogenous types such as
-heterogenous ordered pair, heterogenous vector types, etc. One possible
+major obstacle for the implementation of heterogeneous types such as
+heterogeneous ordered pair, heterogeneous vector types, etc. One possible
 solution to this problem is introducing the notion of container types.
 
 \medskip
@@ -167,7 +167,7 @@ operators could also be referred to as the ``r-type of'' and ``l-type of''
 operators. It should be noted that l-context denotes everything that is
 \textit{assignable} (indicated as a storable memory) and the r-context, on the
 other hand, denotes everything that is \textit{expressible} (can be produced by
-an expression). There is no r-value of the type $\type{Box(T)}$.
+an expression). Therefore, there is no r-value of the type $\type{Box(T)}$.
 
 \begin{gather}
   \inferrule{\syntax{triv $\syntaxvar{x}$}}{\syntaxvar{x} \rtypeof \type{Triv}}\\
@@ -190,15 +190,14 @@ Rule 10 shows the r-value of the immutable syntax variable.
   \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{ref}\ \syntaxvar{x} \ltypeof \type{Box(Ref(T))}}
 \end{gather}
 
-Rules 11 and 12 describe the behavior of the \syntax{ref} operator when applied
-on container types.
+Rules 11 and 12 describe the behavior of the \syntax{ref} type constructor when
+applied on container types.
 
 \begin{gather}
   \inferrule{\syntaxvar{x} \ltypeof \type{T}}{\syntax{\&}\ \syntaxvar{x} \rtypeof \type{Ref(T)}}
 \end{gather}
 
-Rule 13 specifies the behavior of \syntax{\&} operator, when applied on the
-container type.
+Rule 13 provides the r-type of the referenced container.
 
 \begin{gather}
   \inferrule{\syntaxvar{x} \rtypeof \type{Ref(Box(T))}}{\syntaxvar{x}\ \syntax{@} \rtypeof \type{T}}\\
@@ -238,14 +237,14 @@ parameter is passed when the function is being called.
   &\syntax{immut int ii}             &&\to ii   &&\to \type{IBox(Int)}\\
   &\syntax{ref int ri}               &&\to ri   &&\to \type{Box(Ref(Box(Int)))}\\
   &\syntax{immut ref int iri}        &&\to iri  &&\to \type{IBox(Ref(Box(Int)))}\\
-  &\syntax{ref immut int rii}        &&\to rii  &&\to \type{Box(Ref((IBox(Int))))}\\
-  &\syntax{immut ref immut int irii} &&\to irii &&\to \type{IBox(Ref((IBox(Int))))}
+  &\syntax{ref immut int rii}        &&\to rii  &&\to \type{Box(Ref(IBox(Int)))}\\
+  &\syntax{immut ref immut int irii} &&\to irii &&\to \type{IBox(Ref(IBox(Int)))}
 \end{align*}
 
 \medskip
 
-Type $\type{Immut\ Box(Immut\ Box(Int))}$ cannot exist. Nested $\type{Box}$
-types are only possible when there is at least one $\type{Ref}$ type.
+Type $\type{IBox(IBox(Int))}$ cannot exist. Nested $\type{Box}$ types are only
+possible when there is at least one $\type{Ref}$ type.
 
 \begin{gather*}
   \type{Box(Triv)}  \subtypecont \type{Box(Triv)}\\
